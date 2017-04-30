@@ -8,9 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		33B562951EB4EA4B0032EB4F /* RelLinkParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33B5628B1EB4EA4B0032EB4F /* RelLinkParser.framework */; };
-		33B5629A1EB4EA4B0032EB4F /* RelLinkParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B562991EB4EA4B0032EB4F /* RelLinkParserTests.swift */; };
 		33B5629C1EB4EA4B0032EB4F /* RelLinkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 33B5628E1EB4EA4B0032EB4F /* RelLinkParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33B562B31EB4EA730032EB4F /* RealLinkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B562B21EB4EA730032EB4F /* RealLinkParser.swift */; };
+		33DA4C481EB5477600A587BB /* Kanna.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33DA4C471EB5477600A587BB /* Kanna.framework */; };
+		33DA4C4A1EB5489300A587BB /* Kanna.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33DA4C471EB5477600A587BB /* Kanna.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		33DA4C521EB54ACA00A587BB /* RealLinkParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DA4C4D1EB5497400A587BB /* RealLinkParserTests.swift */; };
+		33DA4C531EB54AE200A587BB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33DA4C4C1EB5497400A587BB /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,14 +26,28 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		33DA4C491EB5487E00A587BB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				33DA4C4A1EB5489300A587BB /* Kanna.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		33B5628B1EB4EA4B0032EB4F /* RelLinkParser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RelLinkParser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		33B5628E1EB4EA4B0032EB4F /* RelLinkParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RelLinkParser.h; sourceTree = "<group>"; };
 		33B5628F1EB4EA4B0032EB4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		33B562941EB4EA4B0032EB4F /* RelLinkParserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelLinkParserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		33B562991EB4EA4B0032EB4F /* RelLinkParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelLinkParserTests.swift; sourceTree = "<group>"; };
-		33B5629B1EB4EA4B0032EB4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		33B562B21EB4EA730032EB4F /* RealLinkParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealLinkParser.swift; sourceTree = "<group>"; };
+		33DA4C471EB5477600A587BB /* Kanna.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kanna.framework; path = Carthage/Build/iOS/Kanna.framework; sourceTree = "<group>"; };
+		33DA4C4C1EB5497400A587BB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		33DA4C4D1EB5497400A587BB /* RealLinkParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealLinkParserTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33DA4C481EB5477600A587BB /* Kanna.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,8 +74,9 @@
 			isa = PBXGroup;
 			children = (
 				33B5628D1EB4EA4B0032EB4F /* RelLinkParser */,
-				33B562981EB4EA4B0032EB4F /* RelLinkParserTests */,
+				33DA4C4B1EB5497400A587BB /* RelLinkParserTests */,
 				33B5628C1EB4EA4B0032EB4F /* Products */,
+				33DA4C461EB5477500A587BB /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -80,11 +99,19 @@
 			path = RelLinkParser;
 			sourceTree = "<group>";
 		};
-		33B562981EB4EA4B0032EB4F /* RelLinkParserTests */ = {
+		33DA4C461EB5477500A587BB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				33B562991EB4EA4B0032EB4F /* RelLinkParserTests.swift */,
-				33B5629B1EB4EA4B0032EB4F /* Info.plist */,
+				33DA4C471EB5477600A587BB /* Kanna.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		33DA4C4B1EB5497400A587BB /* RelLinkParserTests */ = {
+			isa = PBXGroup;
+			children = (
+				33DA4C4C1EB5497400A587BB /* Info.plist */,
+				33DA4C4D1EB5497400A587BB /* RealLinkParserTests.swift */,
 			);
 			path = RelLinkParserTests;
 			sourceTree = "<group>";
@@ -111,6 +138,7 @@
 				33B562871EB4EA4B0032EB4F /* Frameworks */,
 				33B562881EB4EA4B0032EB4F /* Headers */,
 				33B562891EB4EA4B0032EB4F /* Resources */,
+				33DA4C491EB5487E00A587BB /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -158,6 +186,7 @@
 					33B562931EB4EA4B0032EB4F = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 26VU3UTL8J;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -192,6 +221,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33DA4C531EB54AE200A587BB /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,7 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33B5629A1EB4EA4B0032EB4F /* RelLinkParserTests.swift in Sources */,
+				33DA4C521EB54ACA00A587BB /* RealLinkParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +366,11 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = RelLinkParser/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
@@ -358,6 +393,11 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2/**";
 				INFOPLIST_FILE = RelLinkParser/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
@@ -373,11 +413,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 26VU3UTL8J;
 				INFOPLIST_FILE = RelLinkParserTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = software.studioh.RelLinkParserTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "RelLinkParserTests/RelLinkParserTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -386,11 +429,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 26VU3UTL8J;
 				INFOPLIST_FILE = RelLinkParserTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = software.studioh.RelLinkParserTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "RelLinkParserTests/RelLinkParserTests-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -414,6 +459,7 @@
 				33B562A11EB4EA4B0032EB4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		33B562A21EB4EA4B0032EB4F /* Build configuration list for PBXNativeTarget "RelLinkParserTests" */ = {
 			isa = XCConfigurationList;
@@ -422,6 +468,7 @@
 				33B562A41EB4EA4B0032EB4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

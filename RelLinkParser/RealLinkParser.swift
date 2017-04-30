@@ -7,56 +7,57 @@
 //
 
 import Foundation
+import Kanna
 
 public class RealLinkParser {
     
-    struct IndieWebMeEndpoints {
-        var authorization_endpoint: URL?
-        var token_endpoint: URL?
-        var micropub: URL?
-    }
+//    public enum IndieWebEndpointType: String {
+//        case Authorization = "authorization_endpoint"
+//        case Token = "token_endpoint"
+//        case Micropub = "micropub"
+//    }
 
-    public func fetchEndpoints(url: URL, completion: @escaping (IndieWebMeEndpoints) -> ()) {
-        let endpointGroup = DispatchGroup()
-        var endpoints = IndieWebMeEndpoints()
+    /**
+     Retrieves all HTTP Link Headers and relationship tags from site's HTML
+     
+     - Parameters
+        - fromUrl: The normalized URL to get relationship tags from.
+        - completion: A closure that gets called with the dictionary of the links after processing.
+     */
+    public static func getRelLinks(fromUrl url: URL, completion: @escaping ([String: [URL]]) -> ()) {
+        let fetchSitesGroup = DispatchGroup()
+        var endpoints: [String: [URL]] = [:]
         
-        endpointGroup.enter()
-        discoverEndpoint(.Authorization, atUrl: url) { endpointUrl in
-            if let authorizationEndpoint = endpointUrl {
-                print("Authorization Endpoint Found \(authorizationEndpoint)")
-                endpoints.authorization_endpoint = authorizationEndpoint
-            } else {
-                print("Authorization Endpoint Failed");
+        fetchSitesGroup.enter()
+        fetchSiteData(fromUrl: url) { (httpHeader, htmlBody) in
+            
+            let fetchLinksGroup = DispatchGroup()
+            
+            fetchLinksGroup.enter()
+            fetchEndpoints(fromHttpHeaders: httpHeader) { endpointUrls in
+                for urlType in endpointUrls.keys {
+                    endpoints = saveEndpointUrls(endpointUrls[urlType]!, withName: urlType, inDictionary: endpoints)
+                }
+                fetchLinksGroup.leave()
+            }
+        
+            if let html = htmlBody {
+                fetchLinksGroup.enter()
+                fetchLinks(fromHtml: html) { endpointUrls in
+                    for urlType in endpointUrls.keys {
+                        endpoints = saveEndpointUrls(endpointUrls[urlType]!, withName: urlType, inDictionary: endpoints)
+                    }
+                    fetchLinksGroup.leave()
+                }
             }
             
-            endpointGroup.leave()
-        }
-        
-        endpointGroup.enter()
-        discoverEndpoint(.Token, atUrl: url) { endpointUrl in
-            if let tokenEndpoint = endpointUrl {
-                print("Token Endpoint Found \(tokenEndpoint)")
-                endpoints.token_endpoint = tokenEndpoint
-            } else {
-                print("Token Endpoint Failed");
-            }
-            endpointGroup.leave()
-        }
-        
-        endpointGroup.enter()
-        discoverEndpoint(.Micropub, atUrl: url) { endpointUrl in
-            if let micropubEndpoint = endpointUrl {
-                print("Micropub Endpoint Found \(micropubEndpoint)")
-                endpoints.micropub = micropubEndpoint
-            } else {
-                print("Micropub Endpoint Failed");
-            }
             
-            endpointGroup.leave()
+            fetchLinksGroup.notify(queue: DispatchQueue.global(qos: .background)) {
+                fetchSitesGroup.leave()
+            }
         }
         
-        endpointGroup.notify(queue: DispatchQueue.global(qos: .background)) {
-            print("AReturning Endpoints")
+        fetchSitesGroup.notify(queue: DispatchQueue.global(qos: .background)) {
             completion(endpoints)
         }
     }
@@ -64,7 +65,7 @@ public class RealLinkParser {
     // Input: Any URL or string like "eddiehinkle.com"
     // Output: Normlized URL (default to http if no scheme, default "/" path)
     //         or return false if not a valid URL (has query string params, etc)
-    public func normalizeMeURL(url: String) -> URL? {
+    public static func normalizeMeURL(url: String) -> URL? {
         
         var meUrl = URLComponents(string: url)
         
@@ -103,15 +104,14 @@ public class RealLinkParser {
         return meUrl?.url
     }
     
-    public func discoverEndpoint(_ endpointType: IndieWebEndpointType, atUrl meUrl: URL, completion: @escaping (URL?) -> ()) {
+    public static func fetchSiteData(fromUrl meUrl: URL, completion: @escaping ((HTTPURLResponse, Data?)) -> ()) {
         let request = URLRequest(url: meUrl)
         
         // set up the session
         let config = URLSessionConfiguration.default
         let session = URLSession(configuration: config)
         
-        let task = session.dataTask(with: request) {
-            (data, response, error) in
+        let task = session.dataTask(with: request) { (data, response, error) in
             // check for any errors
             guard error == nil else {
                 print("error calling GET on \(meUrl)")
@@ -121,45 +121,108 @@ public class RealLinkParser {
             
             // Check if endpoint is in the HTTP Header fields
             if let httpResponse = response as? HTTPURLResponse {
-                if let linkHeaderString = httpResponse.allHeaderFields["Link"] as? String {
-                    let linkHeaders = linkHeaderString.characters.split(separator: ",").map({charactersSequence in
-                        return self.matches(for: "<([a-zA-Z:\\/\\.]+)>; rel=\"\(endpointType.rawValue)\"", in: String.init(charactersSequence))
-                    })
-                    
-                    for headerLink in linkHeaders {
-                        for link in headerLink {
-                            if let headerUrl = URL(string: link) {
-                                completion(headerUrl)
-                                return
-                            }
-                        }
-                    }
-                    
-                }
+                completion(httpResponse, data)
             }
             
-            // Check if endpoint is in the HTML Head
-            //            if let responseData = data {
-            //
-            //            }
-            
-            
-            completion(nil)
         }
         
         task.resume()
+        
+    }
+    
+    public static func fetchEndpoints(fromHttpHeaders httpResponse: HTTPURLResponse, completion: @escaping ([String: [URL]]) -> ()) {
+        
+        var endpointsFound: [String: [URL]] = [:]
+        
+        // Get link field
+        if let linkHeaderString = httpResponse.allHeaderFields["Link"] as? String {
+            // Split Link String into the various segments
+            let linkHeaders = linkHeaderString.characters.split(separator: ",").map({charactersSequence in
+                // Run regex on each link segment
+                return self.linkMatches(for: "<([a-zA-Z:\\/\\.]+)>; rel=\"([a-zA-Z_-]+)\"", in: String.init(charactersSequence))
+            })
+            
+            for headerLink in linkHeaders {
+                if (headerLink.count > 0) {
+                    let linkType = headerLink[1]
+                    if let linkUrl = URL(string: headerLink[0]) {
+                        if endpointsFound[linkType] == nil {
+                            endpointsFound[linkType] = []
+                        }
+                        endpointsFound[linkType]?.append(linkUrl)
+                    }
+                }
+            }
+        }
+        
+        completion(endpointsFound)
+        
+    }
+    
+    public static func fetchLinks(fromHtml htmlBody: Data, completion: @escaping ([String: [URL]]) -> ()) {
+        
+        var endpointsFound: [String: [URL]] = [:]
+        
+        // Parse HTML from returned body
+        if let doc = HTML(html: htmlBody, encoding: .utf8) {
+            // Look for all rel tags
+            for relTag in doc.css("[rel]") {
+                if let relLink = relTag["href"], let relName = relTag["rel"] {
+                    // if any rel tags have multiple relations, we should store each one seperately
+                    for individualRelName in relName.components(separatedBy: " ") {
+                        endpointsFound = saveEndpointUrl(relLink, withName: individualRelName, inDictionary: endpointsFound)
+                    }
+                }
+            }
+        }
+        
+        completion(endpointsFound)
+        
+    }
+    
+    static func saveEndpointUrl(_ url: String,
+                         withName name: String,
+                         inDictionary existingEndpoints: [String: [URL]]) -> [String: [URL]] {
+        
+        var endpointsFound = existingEndpoints
+        
+        if let linkUrl = URL(string: url) {
+            if endpointsFound[name] == nil {
+                endpointsFound[name] = []
+            }
+            endpointsFound[name]?.append(linkUrl)
+        }
+        
+        return endpointsFound
+    }
+    
+    static func saveEndpointUrls(_ urls: [URL],
+                                withName name: String,
+                                inDictionary existingEndpoints: [String: [URL]]) -> [String: [URL]] {
+        
+        var endpointsFound = existingEndpoints
+        
+        if endpointsFound[name] == nil {
+            endpointsFound[name] = []
+        }
+        if let existingUrls = existingEndpoints[name] {
+            endpointsFound[name] = existingUrls + urls
+        } else {
+            endpointsFound[name] = urls
+        }
+        
+        return endpointsFound
     }
     
     // Utlity Methods
-    func matches(for regex: String, in text: String) -> [String] {
+    static func linkMatches(for regex: String, in text: String) -> [String] {
         
         do {
             let regex = try NSRegularExpression(pattern: regex)
             let nsString = text as NSString
             let results = regex.matches(in: text, range: NSRange(location: 0, length: nsString.length))
             var matches: [String] = []
-            // TODO: This currently returns the entire match, this needs to be modified to return only the captured groups
-            // look more into this https://code.tutsplus.com/tutorials/swift-and-regular-expressions-swift--cms-26626
+
             for match in results {
                 for n in 1..<match.numberOfRanges {
                     let range = match.rangeAt(n)
